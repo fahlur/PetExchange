@@ -1,0 +1,20 @@
+name: PetExchange
+main: me.Fahlur.PetExchange.PetExchange
+version: 1.0
+description: Pet Trading Plugin
+commands:  
+   PetExchange:
+    usage: /<command>
+    aliases: [pe]
+    description: Returns plugin version
+   CheckOwner:
+    usage: /<command>
+    aliases: [co]
+    description: Check Pets Owner
+   SetOwner:
+    usage: /<command>
+    aliases: [so]
+    description: Gives the pet a new owner   
+permissions:
+   pe.exchangepets:
+    description: Ability to exchange pets and check the owners of pets
