@@ -7,8 +7,8 @@ Ability to give your pets to a new owner
   
   
 ##Commands:
-  /petexchange - Returns plugin version
+  /petExchange - Returns plugin version
   
-  /CheckOwner - After typing this command right click the pet and it will tell you who the owner is.
+  /checkOwner - After typing this command right click the pet and it will tell you who the owner is.
   
-  /setowner {name} - Replace {name} with the new owners player name and then hit enter and right click the pet you wish to give to the new owner!
+  /setOwner {name} - Replace {name} with the new owners player name and then hit enter and right click the pet you wish to give to the new owner!
