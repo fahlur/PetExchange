@@ -3,8 +3,8 @@ Ability to give your pets to a new owner
 
 
 ##Permissions:
-pe.exchangepets
-  
+**pe.exchangepets**  
+Ability to exchange pets and check the owners of pets
   
 ##Commands:
 **/petExchange**  
