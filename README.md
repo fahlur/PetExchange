@@ -1,7 +1,5 @@
-# PetExchange
-Ability to give your pets to a new owner
-
-![alt text](http://i.imgur.com/KmkObZb.png "Logo Title Text 1")
+![alt text](http://i.imgur.com/KmkObZb.png "PetExchange")
+#Ability to give your pets to a new owner
 
 ##Permissions:
 **pe.exchangepets**  
