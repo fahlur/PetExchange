@@ -14,7 +14,16 @@ commands:
    SetOwner:
     usage: /<command>
     aliases: [so]
-    description: Gives the pet a new owner   
+    description: Gives the pet a new owner 
+   Tame:
+    usage: /<command>
+    description: Sets owner of pet thats not tamed
+   Untame:
+    usage: /<command>
+    aliases: [ut]
+    description: Releases animal to the wild
 permissions:
    pe.exchangepets:
     description: Ability to exchange pets and check the owners of pets
+   pe.admin:
+    description: Ability to override and change anyones ownership of a pet
