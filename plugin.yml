@@ -1,6 +1,6 @@
 name: PetExchange
 main: me.Fahlur.PetExchange.PetExchange
-version: 1.0
+version: 1.2.0
 description: Pet Trading Plugin
 commands:  
    PetExchange:
@@ -22,6 +22,10 @@ commands:
     usage: /<command>
     aliases: [ut]
     description: Releases animal to the wild
+   horsestats:
+    usage: /<command>
+    aliases: [hs]
+    description: Displays the horse stats
 permissions:
    pe.exchangepets:
     description: Ability to exchange pets and check the owners of pets
