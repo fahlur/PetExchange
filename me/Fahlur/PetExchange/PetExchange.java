@@ -1,22 +1,26 @@
 package me.Fahlur.PetExchange;
 
 import net.milkbowl.vault.permission.Permission;
+import net.minecraft.server.v1_9_R1.NBTTagCompound;
+import net.minecraft.server.v1_9_R1.NBTTagList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHorse;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Horse.Variant;
+import org.bukkit.entity.NPC;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Tameable;
-import org.bukkit.entity.Wolf;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -117,6 +121,7 @@ public class PetExchange extends JavaPlugin implements Listener {
 		}
 		
 
+
 		
 		if (cmd.getName().equalsIgnoreCase("tame")){
 			if (!permission.has(player, "pe.admin")){
@@ -203,8 +208,34 @@ public class PetExchange extends JavaPlugin implements Listener {
 					}
 				}
 			}, 10 * 20L);}
+		
+		if (cmd.getName().equalsIgnoreCase("horsestats")){
+			sender.sendMessage(ChatColor.GOLD + "Right click a pet within 10 seconds to check horse stats");
+			
+			HashMap<String, String> options = new HashMap<String, String>();
+			options.put("type", "horsestats");
+			
+			petAction.put(sender.getName(), options);
+			
+			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+				public void run() {
+					if (petAction.containsKey(sender.getName())) {
+						HashMap<String, String> options = petAction.get(sender.getName());
+						
+						if (options.get("type").equals("horsestats")) {
+							petAction.remove(sender.getName());
+							sender.sendMessage(ChatColor.YELLOW + "Horse stats check expired");
+						}
+					}
+				}
+			}, 10 * 20L);}
+		
+		
 		return true;
 	}
+
+	
+	
 
 
 	
@@ -216,6 +247,7 @@ public class PetExchange extends JavaPlugin implements Listener {
 		Entity ent = event.getEntity();
 		String returnMessage = ChatColor.RED + "[petExchange] " + ChatColor.GRAY + "Sorry that animal is protected!";
 
+		/*
 		if (damager instanceof Projectile){
 			Projectile projectile = (Projectile) damager;
 			if (projectile.getShooter() instanceof Player){
@@ -239,14 +271,55 @@ public class PetExchange extends JavaPlugin implements Listener {
 				}
 			}
 		}
-		
+		*/
 	}
+	
+	
+
+	public double getSpeed(Horse horse) {
+		double speed = -1.0D;
+	      CraftHorse cHorse = (CraftHorse)horse;
+	      NBTTagCompound compound = new NBTTagCompound();
+	      cHorse.getHandle().b(compound);
+	      NBTTagList list = (NBTTagList)compound.get("Attributes");
+	      for (int i = 0; i < list.size(); i++)
+	      {
+	        NBTTagCompound base = list.get(i);
+	        if (base.getTypeId() == 10)
+	        {
+	          NBTTagCompound attrCompound = base;
+	          if (base.toString().contains("generic.movementSpeed")) {
+	            speed = attrCompound.getDouble("Base");
+	          }
+	        }
+	    }
+	    return speed;
+	}
+	
 	
 	
 	long time = 0;
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerRightClickEntity(PlayerInteractEntityEvent event){
+		
+		Player pl = event.getPlayer();
+	    Entity hi = event.getRightClicked();
+		if (hi instanceof NPC){
+			if (pl.isSneaking()){
+				NPC v = (NPC) hi;
+				if (pl.getItemInHand().getType().toString() == "SPONGE"){
+					event.setCancelled(true);
+					((Villager) v).getInventory().clear();
+				}	
+			}
+		}
+		
+		
+		
+		
+		
+		
 		
 		if (!petAction.containsKey(event.getPlayer().getName())) {
 			Player p = event.getPlayer();
@@ -268,26 +341,18 @@ public class PetExchange extends JavaPlugin implements Listener {
 					}
 					
 					
-					
-					
-					
-					if (horse.getAge() != 0){
-						horse.setPassenger(p);
-						horse.setAgeLock(true);
-						return;
-					}
-					
-					
-					
-					
 					if (horse.getVariant().equals(Variant.SKELETON_HORSE)){
 						
 						if (horse.getOwner() == null){
 							int rand = randInt(1,10);
-							if (rand < 8){
+							if (rand < 6){
 								horse.getLocation().getWorld().playEffect(horse.getEyeLocation().add(0D, 0D, 0.0D), Effect.VILLAGER_THUNDERCLOUD, null);
-								p.getLocation().getWorld().playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_HORSE_DEATH, 0.5F, 1.0F);
+								p.getLocation().getWorld().playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_HORSE_DEATH, 10F, 0.75F);
+								p.getLocation().getWorld().playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_HORSE_DEATH, 10F, 0.75F);
 								p.sendMessage(ChatColor.DARK_GRAY + "This Skeleton Horse does not accept you as its master!");
+								World world = p.getWorld();
+								world.strikeLightningEffect(p.getLocation());
+								event.setCancelled(true);
 							}else{
 								p.getLocation().getWorld().playEffect(horse.getLocation().add(0.0D, 0D, 0.0D), Effect.HEART, null);
 								p.getLocation().getWorld().playSound(h.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.8F, 0.5F);
@@ -322,6 +387,52 @@ public class PetExchange extends JavaPlugin implements Listener {
 					player.sendMessage(ChatColor.GREEN + "This pet belongs to " + ChatColor.LIGHT_PURPLE + pet.getOwner().getName());
 					
 				}
+				
+				petAction.remove(player.getName());
+				time = System.currentTimeMillis();
+			}
+			
+			
+			
+			// Check horse stats
+			if (options.get("type").equals("horsestats")) {
+				
+				if (pet instanceof Horse){
+					Horse horse = (Horse) pet;
+					double jump = -0.1817584952 * Math.pow(horse.getJumpStrength(), 3.0D) + 3.689713992 * Math.pow(horse.getJumpStrength(), 2.0D) + 2.128599134 * horse.getJumpStrength() - 0.343930367;
+							//5.5D * Math.pow(horse.getJumpStrength(), 3.0D);
+					double health = horse.getHealth()/2;
+					double speed = getSpeed(horse);
+					
+					// TODO
+					float speedbps = (float) getSpeed(horse)*48;
+				
+					
+					
+				
+
+					
+					player.sendMessage(ChatColor.GREEN+"-Horse Information---");
+					if (pet.getOwner() != null) {
+						player.sendMessage(ChatColor.GREEN+"Owner: "+ChatColor.GOLD+pet.getOwner().getName().toString());
+					}else{
+						player.sendMessage(ChatColor.GREEN+"Owner: "+ChatColor.GRAY+"Untamed");
+					}
+					player.sendMessage(ChatColor.GREEN+"Health: "+ChatColor.GOLD + (int) health + " Hearts");
+					player.sendMessage(ChatColor.GREEN+"Jump Height: "+ ChatColor.GOLD + (float) jump);
+					player.sendMessage(ChatColor.GREEN+"Speed: "+ChatColor.GOLD + speedbps + " bps" + ChatColor.GRAY + "("+speed+")");
+					
+					event.setCancelled(true);
+					
+					
+					
+				}
+				
+				
+				
+				
+				
+				
 				
 				petAction.remove(player.getName());
 				time = System.currentTimeMillis();
